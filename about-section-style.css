@@ -1,0 +1,18 @@
+#links {
+    padding-top: 50px;
+    text-align: center;
+}
+a {
+    padding-left: 50px;
+    position:relative;
+}
+#background {
+    background: cadetblue;
+    min-height: 100%;
+    min-width: 1024px;
+    width: 100%;
+    height: auto;
+    position: fixed;
+    top: 0;
+    left: 0;
+}

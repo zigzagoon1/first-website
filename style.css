@@ -30,3 +30,11 @@ h4 {
     top: 0;
     left: 0;
 }
+a {
+    position: relative;  
+    padding-left: 50px;
+}
+#links {
+    padding-top: 50px;
+    text-align: center;
+}
