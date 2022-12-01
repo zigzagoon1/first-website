@@ -1,3 +1,17 @@
 body {
-    background: blue;
+    background-color: cadetblue;
+}
+
+h1 {
+    text-align: center;
+    margin: auto;
+}
+
+h3 {
+    text-align: center;
+    margin: auto;
+}
+h4 {
+    text-align: center;
+    margin: auto;
 }
