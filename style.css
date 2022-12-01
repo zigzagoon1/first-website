@@ -1,17 +1,32 @@
-body {
-    background-color: cadetblue;
-}
 
+#intro-text{
+    text-align: center;
+    margin:auto;
+    position:relative;
+}
 h1 {
     text-align: center;
     margin: auto;
+    visibility: visible;
 }
 
 h3 {
     text-align: center;
     margin: auto;
+    visibility: visible;
 }
 h4 {
     text-align: center;
     margin: auto;
+}
+
+#background {
+    background: cadetblue;
+    min-height: 100%;
+    min-width: 1024px;
+    width: 100%;
+    height: auto;
+    position: fixed;
+    top: 0;
+    left: 0;
 }
