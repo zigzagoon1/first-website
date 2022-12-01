@@ -2,7 +2,7 @@
     padding-top: 50px;
     text-align: center;
 }
-a {
+#links > a {
     padding-left: 50px;
     position:relative;
 }
@@ -15,4 +15,14 @@ a {
     position: fixed;
     top: 0;
     left: 0;
+}
+
+#p-about-me {
+    position: relative;
+    padding-top: 100px;
+    text-align: center;
+}
+#p-about-me > a {
+    padding-left: 0px;
+    margin:auto;
 }
