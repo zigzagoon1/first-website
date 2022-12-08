@@ -1,4 +1,5 @@
 const body = document.querySelector("#background");
+console.log(document.querySelector("h1"));
 let bodyBackground = body.style.background;
 const randomColors = ["cadetblue","purple", "blue", "red", "pink", "yellow", "green", "cyan", "white", "orange", "brown"];
 let currentIndex = randomColors[bodyBackground];
