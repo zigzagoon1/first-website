@@ -1,7 +1,12 @@
+const Crafty = require("craftyjs/src/core/core");
+
+//let tinycolor = require('tinycolor2');
 let context = '';
 let canvas = '';
 const circles = [];
 const radius = 25;
+Crafty.init(500,700);
+
 document.addEventListener("DOMContentLoaded", function() {
     canvas = document.getElementById("html-canvas");
     canvas.width = canvas.clientWidth;
@@ -10,13 +15,22 @@ document.addEventListener("DOMContentLoaded", function() {
     let x = radius;
     let y = radius;
     for (let i = 0; i <= 14; i++) {
-        DrawCircle(x, y, radius, 1, '#000000', getRandomColor());
+        const circle = DrawCircle(x, y, radius, 1, '#000000', getRandomColor());
+        circles.push(circle);
         x += radius * 2;
     }
     y += radius * 2;
     x = radius;
-    for (let i = 0; i <= 14; i++) {
-        DrawCircle(x, y, radius, 1, '#000000', getRandomColor());
+    for (let i = 0; i <= canvas.width / (radius * 2); i++) {
+        const circle = DrawCircle(x, y, radius, 1, '#000000', getRandomColor());
+        circles.push(circle);
+        x += radius * 2;
+    }
+    y+=radius * 2;
+    x = radius;
+    for (let i = 0; i < canvas.width / (radius * 2); i++) {
+        const circle = DrawCircle(x, y, radius, 1, '#000000', getRandomColor());
+        circles.push(circle);
         x += radius * 2;
     }
 
@@ -39,16 +53,14 @@ function DrawCircle(x, y, radius, border_size, border_colour, fill_colour) {
         for (let i = 0; i < 6; i++) {
             color += chars[Math.floor(Math.random() * 16)];
         }
+
+        //const c = color.substring(1); //strip #
+        // const rgb = parseInt(color, 16); //convert rrggbb to decimal
+        // const r = (rgb >> 16) & 0xff; //extract red
+        // const g = (rgb >> 8) & 0xff; //extract green
+        // const b = (rgb >> 0) & 0xff; //extract blue
+        // const luma = 0.2126 * r + 0.7152 * g + 0.0722 * b; //get brightness value
+        // tinycolor.init();
+        // console.log(tinycolor(color).getBrightness());
         return color;
     }
-
-
-;//DrawCircle(150, 100, 50, 100, '#000000', '#111111');
-
-// function draw() {
-
-//     circles.forEach(function (circle) {
-//         DrawCircle(circle.x, circle.y, radius, 5, circle.colour, circle.color);
-//     })
-    
-// }
