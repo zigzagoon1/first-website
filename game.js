@@ -1,14 +1,17 @@
 let canvas = '';
 let context = '';
-const circles = [];
+const circles = [{}];
+console.log(circles);
 const radius = 25;
 let gameStart = true;
+let moveCircleBool = false;
 let interval;
 let collision;
 let paddle;
 let collisionDirection;
+const colors = [];
 const clamp = (val, min = 0, max = 650) => Math.max(min, Math.min(max, val));
-
+//create canvas context once content is loaded; make game not start until canvas is clicked
 document.addEventListener("DOMContentLoaded", function() {
     canvas = document.getElementById("html-canvas");  
     canvas.width = canvas.clientWidth;
@@ -16,72 +19,104 @@ document.addEventListener("DOMContentLoaded", function() {
     context = canvas.getContext("2d");
     let x = radius;
     let y = radius;
-    for (let i = 0; i <= 14; i++) {
-        DrawCircles(x, y, radius, 1, '#000000', getRandomColor());
-        circles.push({x:x, y:y});
-        x += radius * 2;
+    for (let i = 0; i < 42; i++){
+        colors.push(getRandomColor());
     }
-    y += radius * 2;
-    x = radius;
-    for (let i = 0; i <= canvas.width / (radius * 2); i++) {
-        DrawCircles(x, y, radius, 1, '#000000', getRandomColor());
-        circles.push({x:x, y:y});
-        x += radius * 2;
-    }
-    y+=radius * 2;
-    x = radius;
-    for (let i = 0; i < canvas.width / (radius * 2); i++) {
-        DrawCircles(x, y, radius, 1, '#000000', getRandomColor());
-        circles.push({x:x, y:y});
-        x += radius * 2;
-    }
-    x = 350;
-    y = 250;
-    drawCircle(x, y, radius - 8, 1, '#000000', '#FFFFFF');
-    DrawRectangle(rect.x);
-canvas.addEventListener('click', () => interval = setInterval(moveCircle, 50));
-
+canvas.addEventListener("click", () => { moveCircleBool = true; })
 }, false);
 
+//rect for the paddle
 let rect = { 
     x: 300,
     y: 475,
     width: 100,
     height: 25
 }
-
-const circle = {
-    radius: 17,
-    x: 350,
-    y: 250,
-    direction: {
+//class to create all the target circles in the game as well as the moving circle
+class circle  {
+    constructor({ position, velocity, radius, color }) {
+        this.position = position
+        this.velocity = velocity 
+        this.radius = radius
+        this.color = color;
+    }
+    draw() {
+        context.beginPath();
+        context.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2);
+        context.fillStyle = this.color;
+        context.fill();
+        context.stroke();
+    }
+    update() {
+        this.position.x = clamp(this.position.x + this.velocity.x, 0, 675);
+        this.position.y = clamp(this.position.y + this.velocity.y, 0, 500);
+    }
+}
+//this is the moving circle
+const gameCircle = new circle( {
+    position: {
+        x: 350,
+        y: 250
+    },
+    velocity: {
         x: 0,
         y: 0
+    },
+    radius: 17,
+    color: 'white'
+})
+//draw all circles at top of game window
+function DrawCircles() {
+    let x = radius;
+    let y = radius;
+    for (let i = 0; i <= 14; i++) {
+        circles[i] = new circle({
+            position:{
+                x: x,
+                y: y
+            }, 
+            velocity: { 
+                x:0,
+                y:0
+            }, 
+            radius:25, 
+            color: colors[i] }).draw();
+        x += radius * 2
+    }
+    y += radius * 2;
+    x = radius;
+    for (let i = 14; i < 28; i++) {
+        circles[i] = new circle({
+            position:{
+                x: x,
+                y: y
+            }, 
+            velocity: { 
+                x:0,
+                y:0
+            }, 
+            radius:25, 
+            color: colors[i] }).draw();
+        x += radius * 2;
+    }
+    y+=radius * 2;
+    x = radius;
+    for (let i = 28; i < 42; i++) {
+        circles[i] = new circle({
+            position:{
+                x: x,
+                y: y
+            }, 
+            velocity: { 
+                x:0,
+                y:0
+            }, 
+            radius:25, 
+            color: colors[i] }).draw();
+        x += radius * 2;
     }
 }
-
-function DrawCircles(x, y, radius, border_size, border_colour, fill_colour) {
-    context.beginPath();
-    context.arc(x,y,radius,0,2*Math.PI);
-    //context.clip();
-    context.strokeStyle = border_colour;
-    context.fillStyle = fill_colour;
-    context.lineWidth = border_size;
-    context.closePath();
-    context.fill();
-    context.stroke();
-    }
-function drawCircle() {
-    context.clearRect(0, 475, 700, -325);
-    context.beginPath();
-    context.arc(circle.x, circle.y, circle.radius, 0, 2*Math.PI);
-    context.strokeStyle = '#000000';
-    context.lineWidth = 1;
-    context.fillStyle = '#FFFFFF';
-    context.closePath();
-    context.fill();
-    context.stroke();
-}
+//draw paddle based on values from rect
 function DrawRectangle(x) {
     canvas = document.getElementById("html-canvas")
     context = canvas.getContext('2d');
@@ -93,7 +128,27 @@ function DrawRectangle(x) {
     context.rect(clamp(x), rect.y, rect.width, rect.height);
     context.closePath();
     context.fill();
+    rect.x = x;
 }
+//continuously wipe clean and redraw the game window
+function animate() {
+    context.clearRect(0, 0, 700, 500);
+    if (moveCircleBool) {
+        if (gameStart) {
+            gameCircle.velocity.y = 10;
+        }
+        checkCollision();
+        gameCircle.update();
+        if (gameCircle.position.y >= 500) {
+            //gameover
+        }
+    }
+    gameCircle.draw();
+    DrawCircles();
+    DrawRectangle(rect.x);
+    window.onmousemove = (e) => DrawRectangle(clamp((canvas.clientWidth / canvas.clientHeight) * e.x / 2, 0, 600));
+}
+const animation = setInterval(animate, 50);
 
 function getRandomColor() {
     var chars = '0123456789ABCDEF';
@@ -109,68 +164,59 @@ function getRandomColor() {
     }
     return color;
 }
+ 
+ 
+// function checkCircleCollision() {
+//     for (let i = 0; i < circles.length - 1; i++) {
+//         if (Math.abs(circles[i].x - circle.x) >= (circles[i].radius + circle.radius)) {
+//             if (Math.abs(circles[i]. y - circle.y) >= (circles[i].radius + circle.radius)) {
+//                 collision = true;
 
-function movePaddle()
- {
-    window.onmousemove = (e) => DrawRectangle(clamp(canvas.clientWidth / canvas.clientHeight) * e.x);
- }
- movePaddle();
- function moveCircle(){
-    if (gameStart) {
-        circle.y += radius / 2;
-        circle.y = clamp(circle.y, 0, 475);
-    }
-    if (collision) {
+//             }
+//         }
+//     }
+// }
+
+function checkCollision() {
+    //check collision with paddle rect
+    const circleBottomY = gameCircle.position.y + gameCircle.radius;
+    const circleTopY = gameCircle.position.y - gameCircle.radius;
+    const circleLeftX = gameCircle.position.x - gameCircle.radius;
+    const circleRightX = gameCircle.position.x + gameCircle.radius;
+    if (gameCircle.position.x >= rect.x - rect.width / 2 && circleBottomY >= rect.y + rect.height / 2) {
         gameStart = false;
-        collisionDirection = {x: circle.x - rect.x, y: circle.y - rect.y }
+        gameCircle.velocity.y = -10;
     }
-    if (!gameStart){
-    console.log("x: " + collisionDirection.x + " y: " + collisionDirection.y);
-
-        if (collisionDirection.x >= 0) {
-            circle.x += radius / 2;
-            circle.x = clamp(circle.x, 0, 675);
-        }
-        if (collisionDirection.y >= 0) {
-            circle.y -= radius / 2;
-            circle.y = clamp(circle.y, 0, 475);
-        }
-        if (collisionDirection.x < 0) {
-            circle.x -= radius / 2;
-            circle.x = clamp(circle.x, 0, 675)
-        }
-        if (collisionDirection.y < 0) {
-            circle.y += radius / 2;
-            circle.y = clamp(circle.y, 0, 475);
-        }
+    if (circleRightX >= rect.x - (rect.width / 2) && gameCircle.position.y >= rect.y - (rect.height / 2)) {
+        gameStart = false;
+        gameCircle.velocity.x = -10;
     }
-    drawCircle();
-    //checkPaddleCollision();
- }
- 
- 
-function checkCircleCollision() {
-    for (let i = 0; i < circles.length - 1; i++) {
-        if (Math.abs(circles[i].x - circle.x) >= (circles[i].radius + circle.radius)) {
-            if (Math.abs(circles[i]. y - circle.y) >= (circles[i].radius + circle.radius)) {
-                collision = true;
-
+    if (circleLeftX <= rect.x + (rect.width / 2) && gameCircle.position.y >= rect.y - (rect.height / 2)) {
+        gameStart = false;
+        gameCircle.velocity.x = 10;
+    }
+    if (circleRightX >= 675) {
+        gameCircle.velocity.x = -10;
+    }
+    if (circleLeftX <= 25) {
+        gameCircle.velocity.x = 10;
+    }
+    if (circleTopY <= 25) {
+        gameCircle.velocity.y = 10;
+    }
+    //check collision with target circles
+    if (gameCircle.velocity.y < 0) {
+        for(let i = 0; i < circles.length - 1; i++) {
+            console.log(circles[i]);
+            if (circleTopY >= circles[i].position.y + circles[i].radius) {
+                destroyCircle(circles[i]);
             }
         }
     }
+
+    function destroyCircle(circle) {
+        context.clearRect(circle.position.x, circle.position.y, circle.radius, circle.radius);
+        circles = circles.splice(circles.indexOf(circle), 1);
+
+    }
 }
-
-function checkPaddleCollision() {
-    const distX = Math.abs(circle.x - rect.x - rect.width / 2);
-    const distY = Math.abs(circle.y - rect.y - rect.height / 2);
-    if (distX > (rect.width / 2 + circle.radius)) { collision =  false; }
-    if (distY > (rect.width / 2 + circle.radius)) { collision = false; }
-
-    if (distX <= (rect.width/2)) { collision = true; }
-    if (distY <= (rect.width/2)) { collision = true; }
-
-    const dx = distX - rect.width / 2;
-    const dy = distY - rect.height / 2;
-    collision = (dx*dx*dy*dy <= (circle.radius * circle.radius));
-}
-const collisionInterval = setInterval(checkPaddleCollision, 10);
