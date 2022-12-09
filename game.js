@@ -34,7 +34,7 @@ canvas.addEventListener("click", () => { moveCircleBool = true; })
 }, false);
 
 //rect for the paddle
-let rect = { 
+const rect = { 
     x: 300,
     y: 475,
     width: 100,
@@ -73,6 +73,7 @@ const gameCircle = new circle( {
     radius: 17,
     color: 'white'
 })
+//initialize circles array and draw , called once
 function initCircles() {
     let x = radius;
     let y = radius;
@@ -135,7 +136,6 @@ function DrawCircles() {
     }
 }
 function destroyCircle(circle) {
-    
     context.clearRect(circle.position.x, circle.position.y, circle.radius, circle.radius);
 }
 //draw paddle based on values from rect
