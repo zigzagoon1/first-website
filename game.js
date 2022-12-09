@@ -4,7 +4,10 @@ const circles = [];
 const radius = 25;
 let gameStart = true;
 let interval;
-const clamp = (val, min = 0, max = 600) => Math.max(min, Math.min(max, val));
+let collision;
+let paddle;
+let collisionDirection;
+const clamp = (val, min = 0, max = 650) => Math.max(min, Math.min(max, val));
 
 document.addEventListener("DOMContentLoaded", function() {
     canvas = document.getElementById("html-canvas");  
@@ -69,7 +72,7 @@ function DrawCircles(x, y, radius, border_size, border_colour, fill_colour) {
     context.stroke();
     }
 function drawCircle() {
-    context.clearRect(0, 475, 700, -300);
+    context.clearRect(0, 475, 700, -325);
     context.beginPath();
     context.arc(circle.x, circle.y, circle.radius, 0, 2*Math.PI);
     context.strokeStyle = '#000000';
@@ -109,21 +112,65 @@ function getRandomColor() {
 
 function movePaddle()
  {
-    window.onmousemove = (e) => DrawRectangle(clamp(canvas.clientWidth/ canvas.clientHeight) * e.x);
+    window.onmousemove = (e) => DrawRectangle(clamp(canvas.clientWidth / canvas.clientHeight) * e.x);
  }
  movePaddle();
  function moveCircle(){
     if (gameStart) {
         circle.y += radius / 2;
+        circle.y = clamp(circle.y, 0, 475);
+    }
+    if (collision) {
+        gameStart = false;
+        collisionDirection = {x: circle.x - rect.x, y: circle.y - rect.y }
+    }
+    if (!gameStart){
+    console.log("x: " + collisionDirection.x + " y: " + collisionDirection.y);
+
+        if (collisionDirection.x >= 0) {
+            circle.x += radius / 2;
+            circle.x = clamp(circle.x, 0, 675);
+        }
+        if (collisionDirection.y >= 0) {
+            circle.y -= radius / 2;
+            circle.y = clamp(circle.y, 0, 475);
+        }
+        if (collisionDirection.x < 0) {
+            circle.x -= radius / 2;
+            circle.x = clamp(circle.x, 0, 675)
+        }
+        if (collisionDirection.y < 0) {
+            circle.y += radius / 2;
+            circle.y = clamp(circle.y, 0, 475);
+        }
     }
     drawCircle();
+    //checkPaddleCollision();
  }
  
  
 function checkCircleCollision() {
+    for (let i = 0; i < circles.length - 1; i++) {
+        if (Math.abs(circles[i].x - circle.x) >= (circles[i].radius + circle.radius)) {
+            if (Math.abs(circles[i]. y - circle.y) >= (circles[i].radius + circle.radius)) {
+                collision = true;
 
+            }
+        }
+    }
 }
 
 function checkPaddleCollision() {
+    const distX = Math.abs(circle.x - rect.x - rect.width / 2);
+    const distY = Math.abs(circle.y - rect.y - rect.height / 2);
+    if (distX > (rect.width / 2 + circle.radius)) { collision =  false; }
+    if (distY > (rect.width / 2 + circle.radius)) { collision = false; }
 
+    if (distX <= (rect.width/2)) { collision = true; }
+    if (distY <= (rect.width/2)) { collision = true; }
+
+    const dx = distX - rect.width / 2;
+    const dy = distY - rect.height / 2;
+    collision = (dx*dx*dy*dy <= (circle.radius * circle.radius));
 }
+const collisionInterval = setInterval(checkPaddleCollision, 10);
