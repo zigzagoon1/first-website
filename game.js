@@ -1,40 +1,45 @@
-const Crafty = require("craftyjs/src/core/core");
-
-//let tinycolor = require('tinycolor2');
-let context = '';
 let canvas = '';
+let context = '';
 const circles = [];
 const radius = 25;
-Crafty.init(500,700);
+
+const clamp = (val, min = 0, max = 600) => Math.max(min, Math.min(max, val));
 
 document.addEventListener("DOMContentLoaded", function() {
-    canvas = document.getElementById("html-canvas");
+    canvas = document.getElementById("html-canvas");  
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
     context = canvas.getContext("2d");
     let x = radius;
     let y = radius;
     for (let i = 0; i <= 14; i++) {
-        const circle = DrawCircle(x, y, radius, 1, '#000000', getRandomColor());
-        circles.push(circle);
+        DrawCircle(x, y, radius, 1, '#000000', getRandomColor());
         x += radius * 2;
     }
     y += radius * 2;
     x = radius;
     for (let i = 0; i <= canvas.width / (radius * 2); i++) {
-        const circle = DrawCircle(x, y, radius, 1, '#000000', getRandomColor());
-        circles.push(circle);
+        DrawCircle(x, y, radius, 1, '#000000', getRandomColor());
         x += radius * 2;
     }
     y+=radius * 2;
     x = radius;
     for (let i = 0; i < canvas.width / (radius * 2); i++) {
-        const circle = DrawCircle(x, y, radius, 1, '#000000', getRandomColor());
-        circles.push(circle);
+        DrawCircle(x, y, radius, 1, '#000000', getRandomColor());
         x += radius * 2;
     }
-
+    x = 350;
+    y = 250;
+    DrawCircle(x, y, radius - 8, 1, '#000000', '#FFFFFF');
+    DrawRectangle(x);
 }, false);
+
+let rect = { 
+    x: 300,
+    y: 475,
+    width: 100,
+    height: 25
+}
 
 function DrawCircle(x, y, radius, border_size, border_colour, fill_colour) {
     context.beginPath();
@@ -46,21 +51,46 @@ function DrawCircle(x, y, radius, border_size, border_colour, fill_colour) {
     context.fill();
     context.stroke();
     }
+function DrawRectangle(x) {
+    canvas = document.getElementById("html-canvas")
+    context = canvas.getContext('2d');
+    context.clearRect(0, rect.y, 700, rect.height);
+    context.beginPath();
+    context.strokeStyle = '#000000';
+    context.lineWidth = 1;
+    context.rect(clamp(x), rect.y, rect.width, rect.height);
+    context.closePath();
+    context.fill();
+}
 
-    function getRandomColor() {
-        var chars = '0123456789ABCDEF';
-        var color = '#';
-        for (let i = 0; i < 6; i++) {
-            color += chars[Math.floor(Math.random() * 16)];
-        }
-
-        //const c = color.substring(1); //strip #
-        // const rgb = parseInt(color, 16); //convert rrggbb to decimal
-        // const r = (rgb >> 16) & 0xff; //extract red
-        // const g = (rgb >> 8) & 0xff; //extract green
-        // const b = (rgb >> 0) & 0xff; //extract blue
-        // const luma = 0.2126 * r + 0.7152 * g + 0.0722 * b; //get brightness value
-        // tinycolor.init();
-        // console.log(tinycolor(color).getBrightness());
-        return color;
+function getRandomColor() {
+    var chars = '0123456789ABCDEF';
+    var color = '#';
+    for (let i = 0; i < 6; i++) {
+        color += chars[Math.floor(Math.random() * 16)];
     }
+
+    if (tinycolor(color).getBrightness() < 100) {
+        return tinycolor(color).lighten(25).toString();
+    }
+    else if (tinycolor(color).getBrightness() > 220) {
+        return tinycolor(color).darken(25).toString();
+    }
+    return color;
+}
+
+function movePaddle()
+ {
+    window.onmousemove = (e) => DrawRectangle(clamp(canvas.clientWidth/ canvas.clientHeight) * e.x); //x = clamp(canvas.clientWidth / canvas.clientWidth) * e.x;
+    //requestAnimationFrame(DrawRectangle);
+    
+ }
+ movePaddle();
+ 
+function checkCircleCollision() {
+
+}
+
+function checkPaddleCollision() {
+
+}
