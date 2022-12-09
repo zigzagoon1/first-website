@@ -2,7 +2,8 @@ let canvas = '';
 let context = '';
 const circles = [];
 const radius = 25;
-
+let gameStart = true;
+let interval;
 const clamp = (val, min = 0, max = 600) => Math.max(min, Math.min(max, val));
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -13,25 +14,30 @@ document.addEventListener("DOMContentLoaded", function() {
     let x = radius;
     let y = radius;
     for (let i = 0; i <= 14; i++) {
-        DrawCircle(x, y, radius, 1, '#000000', getRandomColor());
+        DrawCircles(x, y, radius, 1, '#000000', getRandomColor());
+        circles.push({x:x, y:y});
         x += radius * 2;
     }
     y += radius * 2;
     x = radius;
     for (let i = 0; i <= canvas.width / (radius * 2); i++) {
-        DrawCircle(x, y, radius, 1, '#000000', getRandomColor());
+        DrawCircles(x, y, radius, 1, '#000000', getRandomColor());
+        circles.push({x:x, y:y});
         x += radius * 2;
     }
     y+=radius * 2;
     x = radius;
     for (let i = 0; i < canvas.width / (radius * 2); i++) {
-        DrawCircle(x, y, radius, 1, '#000000', getRandomColor());
+        DrawCircles(x, y, radius, 1, '#000000', getRandomColor());
+        circles.push({x:x, y:y});
         x += radius * 2;
     }
     x = 350;
     y = 250;
-    DrawCircle(x, y, radius - 8, 1, '#000000', '#FFFFFF');
-    DrawRectangle(x);
+    drawCircle(x, y, radius - 8, 1, '#000000', '#FFFFFF');
+    DrawRectangle(rect.x);
+canvas.addEventListener('click', () => interval = setInterval(moveCircle, 50));
+
 }, false);
 
 let rect = { 
@@ -41,9 +47,20 @@ let rect = {
     height: 25
 }
 
-function DrawCircle(x, y, radius, border_size, border_colour, fill_colour) {
+const circle = {
+    radius: 17,
+    x: 350,
+    y: 250,
+    direction: {
+        x: 0,
+        y: 0
+    }
+}
+
+function DrawCircles(x, y, radius, border_size, border_colour, fill_colour) {
     context.beginPath();
     context.arc(x,y,radius,0,2*Math.PI);
+    //context.clip();
     context.strokeStyle = border_colour;
     context.fillStyle = fill_colour;
     context.lineWidth = border_size;
@@ -51,6 +68,17 @@ function DrawCircle(x, y, radius, border_size, border_colour, fill_colour) {
     context.fill();
     context.stroke();
     }
+function drawCircle() {
+    context.clearRect(0, 475, 700, -300);
+    context.beginPath();
+    context.arc(circle.x, circle.y, circle.radius, 0, 2*Math.PI);
+    context.strokeStyle = '#000000';
+    context.lineWidth = 1;
+    context.fillStyle = '#FFFFFF';
+    context.closePath();
+    context.fill();
+    context.stroke();
+}
 function DrawRectangle(x) {
     canvas = document.getElementById("html-canvas")
     context = canvas.getContext('2d');
@@ -58,6 +86,7 @@ function DrawRectangle(x) {
     context.beginPath();
     context.strokeStyle = '#000000';
     context.lineWidth = 1;
+    context.fillStyle = '#FFFFFF'
     context.rect(clamp(x), rect.y, rect.width, rect.height);
     context.closePath();
     context.fill();
@@ -69,7 +98,6 @@ function getRandomColor() {
     for (let i = 0; i < 6; i++) {
         color += chars[Math.floor(Math.random() * 16)];
     }
-
     if (tinycolor(color).getBrightness() < 100) {
         return tinycolor(color).lighten(25).toString();
     }
@@ -81,11 +109,16 @@ function getRandomColor() {
 
 function movePaddle()
  {
-    window.onmousemove = (e) => DrawRectangle(clamp(canvas.clientWidth/ canvas.clientHeight) * e.x); //x = clamp(canvas.clientWidth / canvas.clientWidth) * e.x;
-    //requestAnimationFrame(DrawRectangle);
-    
+    window.onmousemove = (e) => DrawRectangle(clamp(canvas.clientWidth/ canvas.clientHeight) * e.x);
  }
  movePaddle();
+ function moveCircle(){
+    if (gameStart) {
+        circle.y += radius / 2;
+    }
+    drawCircle();
+ }
+ 
  
 function checkCircleCollision() {
 
