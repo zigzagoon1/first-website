@@ -162,7 +162,7 @@ function animate() {
         checkCircleCollision();
         gameCircle.update();
         if (gameCircle.position.y >= 500) {
-            //gameover
+            clearInterval(animation);
         }
     }
     gameCircle.draw();
