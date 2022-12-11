@@ -13,7 +13,7 @@ const colors = [];
 const clamp = (val, min = 0, max = 650) => Math.max(min, Math.min(max, val));
 
 function isNear(circle1, circle2) {
-    if (circle1.position.x < circle2.position.x + radius && circle1.position.x > circle2.position.x - radius && circle1.position.y - circle1.radius <= circle2.position.y + circle2.radius) {
+    if (circle1.position.x + circle1.radius <= circle2.position.x + radius && circle1.position.x - circle1.radius >= circle2.position.x - radius && circle1.position.y - circle1.radius <= circle2.position.y + circle2.radius) {
         return true;
     }
     return false;
@@ -177,7 +177,7 @@ function animate() {
     if (moveCircleBool) {
         if (gameStart) {
             gameCircle.velocity.y = 2;
-            gameCircle.velocity.x = 2;
+            gameCircle.velocity.x = 1;
         }
         checkCollision();
         checkCircleCollision();
