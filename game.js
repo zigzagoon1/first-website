@@ -40,6 +40,24 @@ const rect = {
     width: 100,
     height: 25
 }
+
+class Vector2 {
+    constructor({position}) {
+        this.position = position
+    }
+}
+
+function getDistance(one, two) {
+    const distanceX = one.position.x - two.position.x;
+    const distanceY = two.position.y - one.position.y;
+    return new Vector2({
+        position: {
+            x: distanceX,
+            y: distanceY
+        }
+    })
+}
+
 //class to create all the target circles in the game as well as the moving circle
 class circle  {
     constructor({ position, velocity, radius, color }) {
@@ -56,8 +74,9 @@ class circle  {
         context.stroke();
     }
     update() {
-        this.position.x = clamp(this.position.x + this.velocity.x, 0, 675);
+        this.position.x = clamp(this.position.x + this.velocity.x, 0, 700);
         this.position.y = clamp(this.position.y + this.velocity.y, 0, 500);
+        //console.log("x: " + this.position.x + " y: " + this.position.y);
     }
 }
 //this is the moving circle
@@ -147,30 +166,36 @@ function DrawRectangle(x) {
     context.lineWidth = 1;
     context.fillStyle = '#FFFFFF'
     context.rect(clamp(x), rect.y, rect.width, rect.height);
+    
     context.closePath();
     context.fill();
     rect.x = x;
+    // const topLeft = new Vector2({position: {x: rect.x, y: rect.y}});
+    // console.log("topLeft: " + topLeft.position.x + "," + topLeft.position.y);
+    // const topRight = new Vector2({position: {x: rect.x, y: rect.y}});
+    // console.log("topRight: " + {topRight});
 }
 //continuously wipe clean and redraw the game window
 function animate() {
     context.clearRect(0, 0, 700, 500);
     if (moveCircleBool) {
         if (gameStart) {
-            gameCircle.velocity.y = 10;
+            gameCircle.velocity.y = 2;
+            gameCircle.velocity.x = 2;
         }
         checkCollision();
-        checkCircleCollision();
-        gameCircle.update();
-        if (gameCircle.position.y >= 500) {
-            clearInterval(animation);
-        }
-    }
+    //     checkCircleCollision();
+         gameCircle.update();
+    //     if (gameCircle.position.y >= 500) {
+    //         clearInterval(animation);
+    //     }
+     }
     gameCircle.draw();
-    DrawCircles();
+    // DrawCircles();
     DrawRectangle(rect.x);
     window.onmousemove = (e) => DrawRectangle(clamp((canvas.clientWidth / canvas.clientHeight) * e.x / 2, 0, 600));
 }
-const animation = setInterval(animate, 50);
+const animation = setInterval(animate, 10);
 
 function getRandomColor() {
     var chars = '0123456789ABCDEF';
@@ -201,29 +226,98 @@ function checkCircleCollision() {
 }
 function checkCollision() {
     //check collision with paddle rect
+    //Vector2.getDistance(gameCircle.position, rect.position)
+   const rectVector = new Vector2({position: {x: rect.x, y: rect.y}});
+    const gameCircleVector = new Vector2({position: { x: gameCircle.position.x, y: gameCircle.y}});
+    const distance = getDistance(gameCircle, rectVector);
+
+    //if middle of circle is in between left side x and right side x of paddle, change y direction 
+
+    // if (gameCircle.position.x >= rect.x && gameCircle.position.x < rect.x + rect.width && gameCircle.position.y + gameCircle.radius >= rect.y) {
+    //     //console.log("i hit top of paddle");
+    // }
+
+    //if right side of circle hits between top and bottom of paddle on left side ,change x direction to -10, y = 5
+
+    if (gameCircle.position.x + gameCircle.radius >= rect.x && gameCircle.position.x <= rect.x && gameCircle.position.y >= rect.y) {
+        gameStart = false;
+        gameCircle.velocity.x = -2;
+        console.log("i hit left side");
+    }
+
+    //if 
+
+    //const rectHalfExtents = new Vector2({position: { x: rect.x, y: rect.y}});
+
+    // const clampedX = clamp(distance.position.x, -rectHalfExtents.position.x, rectHalfExtents.position.x);
+    // const clampedY = clamp(distance.position.y, -rectHalfExtents.position.y, rectHalfExtents.position.y);
+    //const closestX = rectVector.position.x + clampedX;
+    //const closestY = rectVector.position.y + clampedY;
+
+    // const differenceX = closestX - gameCircleVector.position.x;
+    // const differenceY = closestY - gameCircleVector.position.y;
+    // if (closestX <= rect.x && distance.position.y <= gameCircle.radius * 2) {
+    //     //hit left side
+    //     gameStart = false;
+    //     gameCircle.velocity.x = -10;
+    //     // console.log("left side hit ball goes to left");
+    //     // console.log("rect x: " + rect.x + " rect y: " + rect.y);
+    //     // console.log("ballx " + gameCircle.position.x + " ball y: " + gameCircle.position.y);
+    // }
+    // else if (closestX > rect.x && distance.position.y < rect.height / 2 + gameCircle.radius && distance.position.x >= closestX) {
+    //     gameStart = false;
+    //     gameCircle.velocity.x = 10;
+    //     // console.log("right side hit, ball goes to right")
+    //     // console.log("rect x: " + rect.x + " rect y: " + rect.y);
+    //     // console.log("ballx " + gameCircle.position.x + " ball y: " + gameCircle.position.y);
+    // }
+    // if (distance.position.y < rect.height / 2 + gameCircle.radius) {
+    //     gameStart = false;
+    //     gameCircle.velocity.y = -10;
+    //     // console.log("top of paddle hit, ball goes up")
+    //     // console.log("rect x: " + rect.x + " rect y: " + rect.y);
+    //     // console.log("ballx " + gameCircle.position.x + " ball y: " + gameCircle.position.y);
+    // }
+    
+    // const rectHalfExtentsXRight = rect.x + (rect.width / 2);
+    // const rectHalfExtentsXLeft = rect.x - (rect.width / 2);
+    // const rectHalfExtentsYDown = rect.y + (rect.height / 2);
+    // const rectHalfExtentsYUp = rect.y - (rect.height / 2);
+
+    // const distanceXRight = clamp(distanceX, -rectHalfExtentsXRight, rectHalfExtentsXRight);
+    // const distanceXLeft = clamp(distanceX, -rectHalfExtentsXLeft, rectHalfExtentsXLeft);
+    // const distanceYDown = clamp(distanceY, -rectHalfExtentsYDown, rectHalfExtentsYDown);
+    // const distanceYUp = clamp(distanceY, -rectHalfExtentsYUp, rectHalfExtentsYUp);
+
+    // const closestXRight = rect.x + distanceXRight;
+    // const closestXLeft = rect.x - distanceXLeft;
+
+
+
+
     const circleBottomY = gameCircle.position.y + gameCircle.radius;
     const circleTopY = gameCircle.position.y - gameCircle.radius;
     const circleLeftX = gameCircle.position.x - gameCircle.radius;
     const circleRightX = gameCircle.position.x + gameCircle.radius;
-    if (gameCircle.position.x >= rect.x - rect.width / 2 && circleBottomY >= rect.y + rect.height / 2) {
-        gameStart = false;
-        gameCircle.velocity.y = -10;
-    }
-    if (circleRightX >= rect.x - (rect.width / 2) && gameCircle.position.y >= rect.y - (rect.height / 2)) {
-        gameStart = false;
+    // if (gameCircle.position.x >= rect.x - rect.width / 2 && circleBottomY >= rect.y + rect.height / 2) {
+    //     gameStart = false;
+    //     gameCircle.velocity.y = -10;
+    // }
+    // if (circleRightX >= rect.x - (rect.width / 2) && gameCircle.position.y >= rect.y - (rect.height / 2)) {
+    //     gameStart = false;
+    //     gameCircle.velocity.x = -10;
+    // }
+    // if (circleLeftX <= rect.x + (rect.width / 2) && gameCircle.position.y >= rect.y - (rect.height / 2)) {
+    //     gameStart = false;
+    //     gameCircle.velocity.x = 10;
+    // }
+    if (circleRightX >= canvas.clientWidth) {
         gameCircle.velocity.x = -10;
     }
-    if (circleLeftX <= rect.x + (rect.width / 2) && gameCircle.position.y >= rect.y - (rect.height / 2)) {
-        gameStart = false;
+    if (circleLeftX <= 0) {
         gameCircle.velocity.x = 10;
     }
-    if (circleRightX >= 675) {
-        gameCircle.velocity.x = -10;
-    }
-    if (circleLeftX <= 25) {
-        gameCircle.velocity.x = 10;
-    }
-    if (circleTopY <= 25) {
+    if (circleTopY <= 0) {
         gameCircle.velocity.y = 10;
     }
 }
