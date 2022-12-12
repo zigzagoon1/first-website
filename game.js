@@ -206,7 +206,7 @@ function getRandomColor() {
 }
 function checkCircleCollision() {
     if (gameCircle.velocity.y < 0) {
-        for(let i = 0; i < circles.length - 1; i++) {
+        for(let i = 0; i < circles.length; i++) {
             if (circles[i] != null) {
                 if (isNear(gameCircle, circles[i])) {
                     gameCircle.velocity.y = 3;
